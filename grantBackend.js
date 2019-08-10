@@ -26,11 +26,29 @@ var checkScore = function (post) {
   return post.score > minScore;
 }
 
-app.get('/', function (req, res) {
+app.get('/Category', function (req, res) {
   minScore = req.query.minScore;
   console.log(req.query);
   var x = `get${req.query.category}`;
   r[x](req.query.subreddit)
+  .then(data => {
+    console.log(data[0].score);
+    data = data.slice(0 , req.query.numPosts).filter(checkScore);
+    console.log(data);
+    res.send(data);
+  })
+
+})
+
+app.get('/Search', function (req, res) {
+  minScore = req.query.minScore;
+  console.log(req.query);
+  r.search({
+    query: req.query.searchTerm,
+    subreddit: req.query.subreddit,
+    time: 'day',
+    sort: 'top',
+  })
   .then(data => {
     console.log(data[0].score);
     data = data.slice(0 , req.query.numPosts).filter(checkScore);
